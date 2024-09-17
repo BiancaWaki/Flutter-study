@@ -5,5 +5,5 @@ void main(){
   runApp(MaterialApp(
     home: Conversor(),
     debugShowCheckedModeBanner: false,
-  ));
+  ),);
 }

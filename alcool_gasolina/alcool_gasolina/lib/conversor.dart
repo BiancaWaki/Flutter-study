@@ -39,7 +39,7 @@ class _ConversorState extends State<Conversor> {
            _resultado = "Abastecer com Alcool";
          });
        }
-       //_limparCampos();
+       _limparCampos();
      }
    }
 
