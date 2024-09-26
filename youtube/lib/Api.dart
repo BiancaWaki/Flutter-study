@@ -16,13 +16,11 @@ class Api{
           "&maxResults=20"
           "&order=date"
           "&key=$CHAVE_YOUTUBE_API"
-          "&channelId=$ID_CANAL"
           "&q=$pesquisa"
         )
     );
 
     if(response.statusCode == 200){
-
       Map<String,dynamic> dadosJson = json.decode(response.body);
       List<Video> videos = dadosJson["items"].map<Video>(
           (map){

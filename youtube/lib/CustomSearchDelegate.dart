@@ -33,7 +33,9 @@ class CustomSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    close(context, query);
+    Future.delayed(Duration.zero, (){
+      close(context, query);
+    });
     return Container();
     throw UnimplementedError();
   }
@@ -41,7 +43,11 @@ class CustomSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return Container();
+    return Container(
+      child: TextField(
+          keyboardType: TextInputType.text,
+      ),
+    );
 
     //SUGESTOES NO MEIO DA PESQUISA
     /*

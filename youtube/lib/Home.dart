@@ -17,18 +17,16 @@ class _HomeState extends State<Home> {
   int _indiceAtual = 0;
   String _resultado = "";
 
-
-
   @override
   Widget build(BuildContext context) {
 
     String resultado = "";
-    List<Widget> telas = [
-      Inicio(_resultado),
-      EmAlta(),
-      Inscricao(),
-      Biblioteca(),
-    ];
+    // List<Widget> telas = [
+    //   Inicio(_resultado),
+    //   EmAlta(),
+    //   Inscricao(),
+    //   Biblioteca(),
+    // ];
 
     return Scaffold(
       appBar: AppBar(
@@ -48,6 +46,7 @@ class _HomeState extends State<Home> {
                   context: context,
                   delegate: CustomSearchDelegate()
               );
+
               setState(() {
                 _resultado = res.toString();
               });
@@ -71,7 +70,12 @@ class _HomeState extends State<Home> {
       ),
       body: Container(
         padding: EdgeInsets.all(16),
-        child: telas[_indiceAtual],
+        child:
+          switch(_indiceAtual)
+          {
+               0 => Inicio(_resultado, key: Key(_resultado)),
+                _ => Container()
+          },
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _indiceAtual,

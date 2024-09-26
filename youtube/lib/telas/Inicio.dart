@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:youtube/Api.dart'; // Certifique-se de que a classe Api está corretamente implementada
+import 'package:youtube/Api.dart';
 import 'package:youtube/model/Video.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class Inicio extends StatefulWidget {
-  String pesquisa;
-  Inicio(this.pesquisa);
+ final String pesquisa;
+ const Inicio(this.pesquisa, {super.key});
 
   @override
   State<Inicio> createState() => _InicioState();
 }
 
 class _InicioState extends State<Inicio> {
+
   late Future<List<Video>> _futureVideos;
   final Map<String, YoutubePlayerController> _controllers = {};
 
@@ -23,7 +24,6 @@ class _InicioState extends State<Inicio> {
 
   @override
   void dispose() {
-    // Dispose todos os controladores para evitar vazamentos de memória
     _controllers.forEach((key, controller) {
       controller.dispose();
     });
