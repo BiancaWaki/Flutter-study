@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:notas_diarias/helper/AnotacaoHelper.dart';
 import 'package:notas_diarias/model/anotacao.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,12 +17,22 @@ class _HomeState extends State<Home> {
   final TextEditingController _tituloController = TextEditingController();
   final TextEditingController _anotacaoController = TextEditingController();
 
-  _exibirTelaCadastro() {
+  _exibirTelaCadastro({Anotacao? anotacao}) {
+    String textoSalvarAtualizar = '';
+    if (anotacao == null) {
+      _tituloController.text = '';
+      _anotacaoController.text = '';
+      textoSalvarAtualizar = 'Salvar';
+    } else {
+      _tituloController.text = anotacao.titulo ?? '';
+      _anotacaoController.text = anotacao.descricao ?? '';
+      textoSalvarAtualizar = 'Atualizar';
+    }
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Adicionar Anotação'),
+          title: Text(textoSalvarAtualizar),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -42,9 +54,9 @@ class _HomeState extends State<Home> {
           ),
           actions: [
             TextButton(
-              child: const Text('Salvar'),
+              child: Text(textoSalvarAtualizar),
               onPressed: () {
-                _salvarAnotacao();
+                _salvarAtualizarAnotacao(anotacaoSelecionada: anotacao);
                 Navigator.pop(context);
               },
             ),
@@ -60,16 +72,24 @@ class _HomeState extends State<Home> {
     );
   }
 
-  _salvarAnotacao() async {
+  _salvarAtualizarAnotacao({Anotacao? anotacaoSelecionada}) async {
     String titulo = _tituloController.text;
     String descricao = _anotacaoController.text;
     DateTime data = DateTime.now();
-    Anotacao anotacao = Anotacao(
-      titulo: titulo,
-      descricao: descricao,
-      data: data.toString(),
-    );
-    await _db.salvarAnotacao(anotacao);
+    if (anotacaoSelecionada == null) {
+      Anotacao anotacao = Anotacao(
+        titulo: titulo,
+        descricao: descricao,
+        data: data.toString(),
+      );
+      await _db.salvarAnotacao(anotacao);
+    } else {
+      anotacaoSelecionada.titulo = titulo;
+      anotacaoSelecionada.descricao = descricao;
+      anotacaoSelecionada.data = data.toString();
+      await _db.atualizarAnotacao(anotacaoSelecionada);
+    }
+
     _tituloController.clear();
     _anotacaoController.clear();
     _recuperarAnotacoes();
@@ -89,7 +109,19 @@ class _HomeState extends State<Home> {
     listaTemporaria = [];
   }
 
-  _formatarData(String? data) {}
+  _formatarData(String? data) {
+    initializeDateFormatting("pt_BR");
+    //var formatador = DateFormat("dd/MM/yy");
+    var formatador = DateFormat.yMMMMd('pt_BR');
+    DateTime dataConvertida = DateTime.parse(data!);
+    String dataFormatada = formatador.format(dataConvertida);
+    return dataFormatada;
+  }
+
+  _removerAnotacao(int id) async {
+    await _db.removerAnotacao(id);
+    _recuperarAnotacoes();
+  }
 
   @override
   void initState() {
@@ -115,6 +147,36 @@ class _HomeState extends State<Home> {
                     title: Text(_anotacoes[index].titulo ?? ''),
                     subtitle: Text(
                         "${_formatarData(_anotacoes[index].data)} - ${_anotacoes[index].descricao}"),
+                    trailing: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            _exibirTelaCadastro(anotacao: _anotacoes[index]);
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.only(right: 16),
+                            child: Icon(
+                              Icons.edit,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            _removerAnotacao(_anotacoes[index].id!);
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.only(right: 0),
+                            child: Icon(
+                              Icons.remove_circle,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
